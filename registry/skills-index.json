@@ -1,0 +1,11 @@
+{
+  "updated_at": "2026-08-12T00:00:00Z",
+  "skills": {
+    "asf-meta": {
+      "stable": null,
+      "canary": null,
+      "versions": ["0.1.0"],
+      "status": "bootstrap"
+    }
+  }
+}

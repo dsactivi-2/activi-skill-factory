@@ -1,0 +1,10 @@
+# Default owner
+* @dsactivi-2
+
+# Human-owned quality and governance
+/evals/golden/ @dsactivi-2
+/policies/ @dsactivi-2
+/.github/workflows/ @dsactivi-2
+/agents/merge-agent/ @dsactivi-2
+/ci/ @dsactivi-2
+/deploy/ @dsactivi-2

@@ -1,0 +1,38 @@
+name: Skill CI
+
+on:
+  pull_request:
+    paths:
+      - "skills/**"
+      - "policies/**"
+      - "evals/**"
+      - "schemas/**"
+      - "ci/**"
+      - "registry/**"
+      - "sources/**"
+      - "agents/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: skill-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install validators
+        run: python3 -m pip install --user pyyaml jsonschema
+      - name: Static validation
+        run: ./ci/validate_skills.sh
+      - name: Security and provenance checks
+        run: ./ci/security_gate.sh
+      - name: Golden and regression evals
+        run: ./ci/run_evals.sh
+      - name: Package dry-run
+        run: ./ci/package_skills.sh --dry-run

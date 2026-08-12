@@ -1,0 +1,48 @@
+name: Skill Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "skills/**"
+      - "registry/**"
+      - "policies/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: skill-release-main
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Install validators
+        run: python3 -m pip install --user pyyaml jsonschema
+      - name: Re-validate merge SHA
+        run: |
+          ./ci/validate_skills.sh
+          ./ci/security_gate.sh
+          ./ci/run_evals.sh
+      - name: Build immutable artifacts
+        run: ./ci/build_release.sh
+      - name: Publish tag, release and registry index
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./ci/publish_release.sh
+      - name: Trigger agent deployment explicitly
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/${{ github.repository }}/dispatches \
+            -f event_type=skill_release \
+            -f client_payload[sha]=${{ github.sha }}

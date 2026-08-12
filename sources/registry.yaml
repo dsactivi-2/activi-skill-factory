@@ -1,0 +1,23 @@
+sources:
+  - source_id: src-asf-dossier
+    name: Autonomous Skill Factory Project Dossier
+    type: internal
+    topics: [asf, governance, cicd]
+    status: trusted
+    authority: 1.0
+    freshness_policy: manual
+    access: repo
+    license_policy: internal
+    url: docs/PHASE0_CHECKLIST.md
+    last_checked_at: "2026-08-12T00:00:00Z"
+  - source_id: src-github-actions-docs
+    name: GitHub Actions official docs
+    type: official_docs
+    topics: [github, actions, cicd]
+    status: trusted
+    authority: 1.0
+    freshness_policy: weekly
+    access: web
+    license_policy: metadata_and_facts_only
+    url: https://docs.github.com/en/actions
+    last_checked_at: "2026-08-12T00:00:00Z"

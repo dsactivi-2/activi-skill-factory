@@ -1,0 +1,18 @@
+skill_id: asf-meta
+ownership: human
+cases:
+  - id: asf-meta-core-rules
+    expect_skill_id: asf-meta
+    skill_md_contains:
+      - "asf-meta"
+      - "immutable Release"
+      - "nie `main`"
+      - "Risk A"
+    skill_md_forbids:
+      - "BEGIN OPENSSH PRIVATE KEY"
+      - "push to main is fine"
+  - id: asf-meta-roles
+    skill_md_contains:
+      - "Builder"
+      - "Merge-Agent"
+      - "Golden Tests"

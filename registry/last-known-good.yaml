@@ -1,0 +1,3 @@
+# Rollback targets per agent/skill. Empty until first successful deploy.
+agents: {}
+updated_at: "2026-08-12T00:00:00Z"

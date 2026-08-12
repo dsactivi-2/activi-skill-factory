@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://activi.local/schemas/skillspec.schema.json",
+  "title": "SkillSpec",
+  "type": "object",
+  "required": ["skill_id", "purpose", "version", "security_profile"],
+  "additionalProperties": true,
+  "properties": {
+    "skill_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,62}$"
+    },
+    "purpose": { "type": "string", "minLength": 10 },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "triggers": { "type": "array", "items": { "type": "string" } },
+    "inputs": { "type": "array" },
+    "outputs": { "type": "array" },
+    "workflow": { "type": "array" },
+    "references": { "type": "array" },
+    "tools": { "type": "array" },
+    "constraints": { "type": "array", "items": { "type": "string" } },
+    "security_profile": {
+      "type": "string",
+      "enum": ["standard", "restricted", "privileged"]
+    },
+    "source_policy": { "type": "string" },
+    "compatibility": { "type": "object" },
+    "evals": { "type": "array" }
+  }
+}

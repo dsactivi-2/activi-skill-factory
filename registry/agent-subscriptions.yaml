@@ -1,0 +1,13 @@
+# No production agents subscribed yet.
+# Example (commented):
+# agents:
+#   sales-agent-de-01:
+#     skills:
+#       voice-sales-agent-builder:
+#         channel: stable
+#         version_range: ">=2.4.0 <3.0.0"
+#         auto_update: true
+#         rollout_group: canary-a
+#         rollback: automatic
+
+agents: {}
