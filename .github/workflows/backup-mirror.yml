@@ -1,0 +1,44 @@
+name: Backup Mirror
+
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backup-mirror
+  cancel-in-progress: false
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Create source bundle
+        run: |
+          mkdir -p .artifacts
+          git bundle create .artifacts/activi-skill-factory.bundle --all
+          tar -czf .artifacts/activi-skill-factory-tree.tgz \
+            --exclude .git --exclude .artifacts --exclude dist .
+          sha256sum .artifacts/* > .artifacts/SHA256SUMS
+      - name: Upload 90-day artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: asf-backup-${{ github.sha }}
+          path: .artifacts/
+          retention-days: 90
+      # Optional second remote: set secret MIRROR_TOKEN + var MIRROR_REPO
+      # (owner/name). Skipped when unset — GitHub Releases remain SoR.
+      - name: Push mirror if configured
+        if: ${{ vars.MIRROR_REPO != '' }}
+        env:
+          MIRROR_TOKEN: ${{ secrets.MIRROR_TOKEN }}
+          MIRROR_REPO: ${{ vars.MIRROR_REPO }}
+        run: |
+          git push --mirror "https://x-access-token:${MIRROR_TOKEN}@github.com/${MIRROR_REPO}.git"

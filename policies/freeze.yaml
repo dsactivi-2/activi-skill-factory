@@ -1,0 +1,9 @@
+# Emergency freeze — any true flag stops the matching pipeline.
+# Set reason + updated_at when flipping.
+build_freeze: false
+release_freeze: false
+deployment_freeze: false
+source_discovery_freeze: false
+reason: ""
+updated_at: "2026-08-12T00:00:00Z"
+updated_by: bootstrap

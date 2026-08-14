@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://activi.local/schemas/agent-subscription.schema.json",
+  "title": "AgentSubscriptions",
+  "type": "object",
+  "required": ["agents"],
+  "properties": {
+    "agents": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["skills"],
+        "properties": {
+          "skills": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "required": ["channel", "version_range"],
+              "properties": {
+                "channel": { "enum": ["dev", "canary", "stable", "pinned"] },
+                "version_range": { "type": "string" },
+                "auto_update": { "type": "boolean" },
+                "rollout_group": { "type": "string" },
+                "rollback": { "enum": ["automatic", "manual"] }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+evidence_id: ev_asf_meta_001
+claim: "Skills must ship as immutable SemVer releases, never as main-branch heads."
+source_id: src-asf-dossier
+source_snapshot: "bootstrap-phase-0"
+source_type: internal
+published_at: "2026-08-12"
+retrieved_at: "2026-08-12"
+confidence: 1.0
+authority: 1.0
+corroboration: 1
+conflicts: []
+affects:
+  - skills/asf-meta/SKILL.md
+  - AGENTS.md
+status: verified

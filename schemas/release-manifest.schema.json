@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://activi.local/schemas/release-manifest.schema.json",
+  "title": "Skill Release Manifest",
+  "type": "object",
+  "required": [
+    "skill_id",
+    "version",
+    "channel",
+    "risk",
+    "artifact_sha256",
+    "commit_sha"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "skill_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,62}$"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "channel": { "enum": ["dev", "canary", "stable"] },
+    "risk": { "enum": ["A", "B", "C"] },
+    "artifact_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$|^pending$"
+    },
+    "commit_sha": { "type": "string" },
+    "min_runtime": { "type": "string" },
+    "max_runtime": { "type": "string" },
+    "dependencies": { "type": "array", "items": { "type": "string" } },
+    "policy_version": { "type": "string" },
+    "eval_report": { "type": "string" },
+    "security_report": { "type": "string" },
+    "released_at": { "type": "string" },
+    "status": { "enum": ["draft", "released", "blocked"] }
+  }
+}

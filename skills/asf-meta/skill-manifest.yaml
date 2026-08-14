@@ -1,0 +1,14 @@
+skill_id: asf-meta
+version: 0.1.0
+channel: dev
+risk: A
+artifact_sha256: pending
+commit_sha: pending
+min_runtime: "1.0.0"
+max_runtime: "<2.0.0"
+dependencies: []
+policy_version: 1.0.0
+eval_report: evals/golden/asf-meta/cases.yaml
+security_report: pending
+released_at: ""
+status: draft

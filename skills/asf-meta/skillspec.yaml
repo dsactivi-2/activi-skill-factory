@@ -1,0 +1,26 @@
+skill_id: asf-meta
+purpose: "Describe the ActiVi Skill Factory operating model for other agents."
+version: 0.1.0
+triggers:
+  - "how does the skill factory work"
+  - "what is the release policy"
+inputs:
+  - question
+outputs:
+  - factory_rules
+workflow:
+  - read AGENTS.md
+  - read policies/release-policy.yaml
+  - answer without proposing a main push
+references:
+  - references/overview.md
+tools: []
+constraints:
+  - never write to main
+  - never modify evals/golden
+security_profile: standard
+source_policy: source
+compatibility:
+  min_runtime: "1.0.0"
+evals:
+  - asf-meta/cases.yaml

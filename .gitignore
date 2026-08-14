@@ -1,0 +1,15 @@
+dist/
+.artifacts/
+__pycache__/
+*.py[cod]
+.DS_Store
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+*.zip
+*.tgz
+node_modules/
+.idea/
+.vscode/

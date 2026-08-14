@@ -1,0 +1,42 @@
+name: Agent Skill Deploy
+
+on:
+  repository_dispatch:
+    types: [skill_release]
+  workflow_dispatch:
+    inputs:
+      skill:
+        description: Skill to deploy (empty = all eligible)
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agent-deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install parsers
+        run: python3 -m pip install --user pyyaml
+      - name: Resolve subscriptions and compatibility
+        run: ./deploy/resolve_targets.sh
+      - name: Verify artifact digest
+        run: ./deploy/verify_artifact.sh
+      - name: Canary rollout
+        run: ./deploy/deploy.sh --stage canary
+      - name: Canary health gate
+        run: ./deploy/health_gate.sh --stage canary
+      - name: Progressive full rollout
+        run: ./deploy/deploy.sh --stage progressive
+      - name: Production health gate
+        run: ./deploy/health_gate.sh --stage production
+      - name: Roll back on failure
+        if: failure()
+        run: ./deploy/rollback.sh --to last-known-good

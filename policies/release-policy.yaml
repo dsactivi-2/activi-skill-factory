@@ -1,0 +1,45 @@
+policy_id: release
+version: 1.0.0
+updated_at: "2026-08-12T00:00:00Z"
+
+semver:
+  A: patch
+  B: minor
+  C: major
+
+merge:
+  A:
+    auto: true
+    required_checks:
+      - validate
+    human_review: false
+  B:
+    auto: false
+    required_checks:
+      - validate
+    human_review: true
+    codeowners: true
+  C:
+    auto: false
+    required_checks:
+      - validate
+    human_review: true
+    environment: production
+    codeowners: true
+
+forbidden:
+  - builder_merges_own_pr
+  - golden_tests_in_builder_pr
+  - overwrite_existing_tag
+  - deploy_from_branch_head
+
+channels:
+  - dev
+  - canary
+  - stable
+  - pinned
+
+rollout:
+  canary_first: true
+  stages: [10, 25, 50, 100]
+  rollback: last_known_good

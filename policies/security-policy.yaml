@@ -1,0 +1,40 @@
+policy_id: security
+version: 1.0.0
+updated_at: "2026-08-12T00:00:00Z"
+
+profiles:
+  standard:
+    network: false
+    secret_env: false
+    timeout_seconds: 30
+  restricted:
+    network: false
+    secret_env: false
+    timeout_seconds: 15
+  privileged:
+    network: false
+    secret_env: false
+    timeout_seconds: 30
+    requires_risk: C
+
+scan:
+  deny_patterns:
+    - "BEGIN OPENSSH PRIVATE KEY"
+    - "BEGIN RSA PRIVATE KEY"
+    - "BEGIN PGP PRIVATE KEY"
+    - "AKIA[0-9A-Z]{16}"
+    - "ghp_[A-Za-z0-9]{20,}"
+    - "github_pat_[A-Za-z0-9_]{20,}"
+    - "xox[baprs]-[A-Za-z0-9-]{10,}"
+  allow_placeholders:
+    - "YOUR_TOKEN_HERE"
+    - "changeme"
+    - "pending"
+
+pii:
+  deny_in_artifacts: true
+  deny_in_evidence_fulltext: true
+
+agents:
+  github_write: false
+  deploy_from: immutable_release_only
