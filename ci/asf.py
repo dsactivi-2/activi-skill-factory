@@ -316,6 +316,97 @@ def cmd_publish(ns: argparse.Namespace) -> None:
     print(f"ok publish ({published} new)")
 
 
+def cmd_review(_: argparse.Namespace) -> None:
+    """Gate used by PR Review workflow. Fails on missing PR metadata."""
+    body = os.environ.get("PR_BODY") or ""
+    title = os.environ.get("PR_TITLE") or ""
+    author = os.environ.get("PR_AUTHOR") or ""
+    number = os.environ.get("PR_NUMBER") or ""
+    base = os.environ.get("BASE_SHA") or "origin/main"
+    head = os.environ.get("HEAD_SHA") or "HEAD"
+
+    errors: list[str] = []
+    warnings: list[str] = []
+
+    risk_m = re.search(r"(?i)\*\*Risk:\*\*\s*([ABC])|Risk:\s*([ABC])", body)
+    risk = (risk_m.group(1) or risk_m.group(2)) if risk_m else ""
+    if not risk:
+        errors.append("PR body missing **Risk:** A / B / C")
+
+    if not re.search(r"(?i)(\*\*Skill:\*\*|Skill:)", body):
+        errors.append("PR body missing **Skill:**")
+
+    if not re.search(r"(?i)(\*\*Mode:\*\*|Mode:)", body):
+        errors.append("PR body missing **Mode:**")
+
+    if not re.search(r"(?i)(evals|validate_skills\.sh)", body):
+        errors.append("PR body missing Evals section")
+
+    try:
+        diff = subprocess.check_output(
+            ["git", "diff", "--name-only", f"{base}...{head}"],
+            cwd=ROOT,
+            text=True,
+            stderr=subprocess.STDOUT,
+        )
+    except subprocess.CalledProcessError as exc:
+        diff = exc.output or ""
+        warnings.append(f"could not compute diff {base}...{head}")
+
+    files = [line.strip() for line in diff.splitlines() if line.strip()]
+    human_prefixes = (
+        "evals/golden/",
+        "policies/",
+        ".github/workflows/",
+        "ci/",
+        "deploy/",
+        "agents/merge-agent/",
+        ".github/CODEOWNERS",
+    )
+    human_hits = [
+        path for path in files if any(path == p or path.startswith(p) for p in human_prefixes)
+    ]
+    if human_hits:
+        warnings.append(
+            "Human-owned paths changed — merge-agent must not auto-merge:\n  "
+            + "\n  ".join(human_hits)
+        )
+    if risk in {"B", "C"}:
+        warnings.append(f"Risk {risk}: human review required")
+
+    report = [
+        f"## PR Review Gate",
+        "",
+        f"- **Title:** {title or '(none)'}",
+        f"- **PR:** #{number or '?'}",
+        f"- **Author:** {author or '(unknown)'}",
+        f"- **Risk:** {risk or 'MISSING'}",
+        f"- **Files:** {len(files)}",
+        "",
+    ]
+    if errors:
+        report.append("### Blocking")
+        report.extend(f"- {item}" for item in errors)
+        report.append("")
+    if warnings:
+        report.append("### Needs human")
+        report.extend(f"- {item}" for item in warnings)
+        report.append("")
+    if not errors:
+        report.append("### Result")
+        report.append("- metadata ok — Skill CI (`validate`) + Secret Scan (`scan`) must still pass")
+        report.append("")
+
+    text = "\n".join(report)
+    out = ROOT / ".artifacts" / "pr-review.md"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(text + "\n", encoding="utf-8")
+    print(text)
+    if errors:
+        fail("PR review gate failed")
+    print("ok review")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -326,6 +417,7 @@ def main() -> None:
     p.add_argument("--dry-run", action="store_true")
     sub.add_parser("build-release")
     sub.add_parser("publish")
+    sub.add_parser("review")
     ns = parser.parse_args()
     {
         "validate": cmd_validate,
@@ -334,7 +426,9 @@ def main() -> None:
         "package": cmd_package,
         "build-release": cmd_build_release,
         "publish": cmd_publish,
+        "review": cmd_review,
     }[ns.cmd](ns)
+
 
 
 if __name__ == "__main__":

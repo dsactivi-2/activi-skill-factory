@@ -2,15 +2,8 @@ name: Skill CI
 
 on:
   pull_request:
-    paths:
-      - "skills/**"
-      - "policies/**"
-      - "evals/**"
-      - "schemas/**"
-      - "ci/**"
-      - "registry/**"
-      - "sources/**"
-      - "agents/**"
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:

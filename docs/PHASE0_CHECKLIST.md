@@ -1,50 +1,39 @@
-# Phase 0 — menschliche Checkliste
-
-Der Bootstrap-Agent darf diese Schritte **nicht** selbst setzen. Einmal im GitHub-UI (oder via Org-Admin) erledigen, **bevor** Auto-Merge oder Agent-CD angehen.
+# Phase 0 — Checkliste
 
 Repo: https://github.com/dsactivi-2/activi-skill-factory
 
-## 1. Branch Protection für `main`
+GitHub Free + privates Repo: **Rulesets, Branch Protection, Environment
+Reviewer und Secret Scanning Push Protection sind plan-gesperrt.** Solange
+das so bleibt, gelten die Workflows + Merge-Agent als Gate.
 
-Settings → Rules → Rulesets (bevorzugt) oder Branch protection:
+## Erledigt (2026-08-14)
 
-- keine direkten Pushes auf `main`
-- Pull Request required
-- required checks: `validate` (Skill CI)
-- 1 Review für alles außer reinen Docs; Risk B/C immer Review
-- dismiss stale reviews
-- keine Self-Approval
-- linear history, squash merge only
-- force push aus, deletions aus
+- [x] Skill CI läuft auf jedem PR und auf `main` (`validate`)
+- [x] Secret Scan läuft auf jedem PR und auf `main` (`scan`)
+- [x] PR Review Gate läuft auf jedem PR (`review`) — Metadaten, Risk, Human-Pfade
+- [x] CODEOWNERS + PR-Template
+- [x] Environments `production` und `staging` existieren (ohne Reviewer/Wait-Timer)
+- [x] Squash-only, Auto-Merge aus, Branch nach Merge löschen
+- [x] Dependabot alerts + automated security fixes
+- [x] Merge-Agent: mergen verboten ohne `validate` + `scan` + `review` + fremdes Review
 
-## 2. Tag-Ruleset
+## Blockiert ohne GitHub Pro (oder öffentliches Repo)
 
-- Pattern: `*/v*`
-- immutable / no force update
-- nur `github-actions[bot]` oder Release-Job darf Tags anlegen
+- [ ] Branch Protection / Ruleset auf `main` (required PR, required checks, 1 Review)
+- [ ] Tag-Ruleset `*/v*` immutable
+- [ ] Environment `production` required reviewer `dsactivi-2` + Wait-Timer
+- [ ] Native Secret Scanning + Push Protection
 
-## 3. Environments
+Wenn du Pro aktivierst: Settings → Branches / Rulesets — Checks `validate`,
+`scan`, `review` required; 1 Review; dismiss stale; no force-push.
 
-- `staging` — optional, keine Reviewer nötig
-- `production` — required reviewers: `dsactivi-2`
-- Wait timer nach Bedarf (z. B. 5 min für Deploy)
+## Optional Mirror
 
-Der Release- und Deploy-Workflow referenziert `environment: production`.
-Ohne Environment schlagen die Jobs fehl — das ist Absicht.
-
-## 4. Security
-
-- Secret scanning an
-- Push protection an
-- Dependabot alerts an (Config liegt unter `.github/dependabot.yml`)
-
-## 5. Optional Mirror
-
-- Privates zweites Repo anlegen (z. B. `activi-skill-factory-mirror`)
+- Privates zweites Repo (z. B. `activi-skill-factory-mirror`)
 - Actions variable `MIRROR_REPO=dsactivi-2/activi-skill-factory-mirror`
 - Actions secret `MIRROR_TOKEN` (fine-grained, contents:write aufs Mirror)
 
-## 6. Nach dem Merge dieses PRs
+## Nach dem Merge von PR #1
 
 - Ersten Release von `asf-meta/v0.1.0` prüfen
 - Deploy-Workflow: darf „no targets“ mit Exit 0 enden
